@@ -1,0 +1,38 @@
+name: Build and Deploy Windows Static Site
+
+on:
+  push:
+    branches:
+      - main  # or your default branch
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: List Directory (for debug)
+      run: |
+        dir
+
+    - name: Upload Static Files as Artifact (optional)
+      uses: actions/upload-artifact@v3
+      with:
+        name: static-site
+        path: ./
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: .  # Current directory (must contain index.html)
